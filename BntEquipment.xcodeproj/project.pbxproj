@@ -23,6 +23,8 @@
 		8019873D1DF1759E005EBB07 /* MBProgressHUD.m in Sources */ = {isa = PBXBuildFile; fileRef = 801987371DF1759E005EBB07 /* MBProgressHUD.m */; };
 		8019873E1DF1759E005EBB07 /* NSData+Bnt.m in Sources */ = {isa = PBXBuildFile; fileRef = 801987391DF1759E005EBB07 /* NSData+Bnt.m */; };
 		8019873F1DF1759E005EBB07 /* NSString+Bnt.m in Sources */ = {isa = PBXBuildFile; fileRef = 8019873B1DF1759E005EBB07 /* NSString+Bnt.m */; };
+		801987421DF5743F005EBB07 /* NSDate+Bnt.m in Sources */ = {isa = PBXBuildFile; fileRef = 801987411DF5743F005EBB07 /* NSDate+Bnt.m */; };
+		801987451DF57779005EBB07 /* DataFooter.m in Sources */ = {isa = PBXBuildFile; fileRef = 801987441DF57779005EBB07 /* DataFooter.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -75,6 +77,10 @@
 		801987391DF1759E005EBB07 /* NSData+Bnt.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSData+Bnt.m"; sourceTree = "<group>"; };
 		8019873A1DF1759E005EBB07 /* NSString+Bnt.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSString+Bnt.h"; sourceTree = "<group>"; };
 		8019873B1DF1759E005EBB07 /* NSString+Bnt.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSString+Bnt.m"; sourceTree = "<group>"; };
+		801987401DF5743F005EBB07 /* NSDate+Bnt.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "NSDate+Bnt.h"; path = "../NSDate+Bnt.h"; sourceTree = "<group>"; };
+		801987411DF5743F005EBB07 /* NSDate+Bnt.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = "NSDate+Bnt.m"; path = "../NSDate+Bnt.m"; sourceTree = "<group>"; };
+		801987431DF57779005EBB07 /* DataFooter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DataFooter.h; sourceTree = "<group>"; };
+		801987441DF57779005EBB07 /* DataFooter.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DataFooter.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -130,6 +136,8 @@
 				801986ED1DF17486005EBB07 /* AppDelegate.m */,
 				801987221DF17545005EBB07 /* EquipSearchController.h */,
 				801987231DF17545005EBB07 /* EquipSearchController.m */,
+				801987431DF57779005EBB07 /* DataFooter.h */,
+				801987441DF57779005EBB07 /* DataFooter.m */,
 				8019871C1DF17545005EBB07 /* CharacteristicDataAnalyse.h */,
 				8019871D1DF17545005EBB07 /* CharacteristicDataAnalyse.m */,
 				8019871E1DF17545005EBB07 /* CharacteristicResponse.h */,
@@ -176,6 +184,8 @@
 		801987321DF1759E005EBB07 /* Help */ = {
 			isa = PBXGroup;
 			children = (
+				801987401DF5743F005EBB07 /* NSDate+Bnt.h */,
+				801987411DF5743F005EBB07 /* NSDate+Bnt.m */,
 				801987331DF1759E005EBB07 /* MBProgressHUD */,
 				801987381DF1759E005EBB07 /* NSData+Bnt.h */,
 				801987391DF1759E005EBB07 /* NSData+Bnt.m */,
@@ -333,9 +343,11 @@
 			buildActionMask = 2147483647;
 			files = (
 				801986EE1DF17486005EBB07 /* AppDelegate.m in Sources */,
+				801987421DF5743F005EBB07 /* NSDate+Bnt.m in Sources */,
 				8019872B1DF17545005EBB07 /* CharacteristicDataAnalyse.m in Sources */,
 				8019873C1DF1759E005EBB07 /* MBProgressHUD+Bnt.m in Sources */,
 				8019872E1DF17545005EBB07 /* EquipSearchController.m in Sources */,
+				801987451DF57779005EBB07 /* DataFooter.m in Sources */,
 				8019873F1DF1759E005EBB07 /* NSString+Bnt.m in Sources */,
 				8019873D1DF1759E005EBB07 /* MBProgressHUD.m in Sources */,
 				8019873E1DF1759E005EBB07 /* NSData+Bnt.m in Sources */,
@@ -493,6 +505,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				DEVELOPMENT_TEAM = PZD8DW62YF;
 				INFOPLIST_FILE = BntEquipment/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = com.yvtang.BntEquipment;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -505,6 +518,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				DEVELOPMENT_TEAM = PZD8DW62YF;
 				INFOPLIST_FILE = BntEquipment/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = com.yvtang.BntEquipment;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -580,6 +594,7 @@
 				801987151DF17486005EBB07 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		801987161DF17486005EBB07 /* Build configuration list for PBXNativeTarget "BntEquipmentTests" */ = {
 			isa = XCConfigurationList;
@@ -588,6 +603,7 @@
 				801987181DF17486005EBB07 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		801987191DF17486005EBB07 /* Build configuration list for PBXNativeTarget "BntEquipmentUITests" */ = {
 			isa = XCConfigurationList;
@@ -596,6 +612,7 @@
 				8019871B1DF17486005EBB07 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};

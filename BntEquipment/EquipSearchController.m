@@ -14,6 +14,8 @@
 #import "NSString+Bnt.h"
 #import "DetectionIndexModel.h"
 #import "MBProgressHUD+Bnt.h"
+#import "NSDate+Bnt.h"
+#import "DataFooter.h"
 
 #define NSLog(FORMAT, ...) fprintf(stderr,"\nfunction:%s line:%d content:\n%s\n", __FUNCTION__, __LINE__, [[NSString stringWithFormat:FORMAT, ##__VA_ARGS__] UTF8String]);
 #define SCREEN_WIDTH  [UIScreen mainScreen].bounds.size.width
@@ -40,7 +42,20 @@
 
 @property (nonatomic, strong) UIButton *scanButton;
 
+@property (nonatomic, strong) UIButton *cutButton;
+
 @property (nonatomic, assign) NSInteger command;//  1001 scan 1002 analyse
+
+@property (nonatomic, strong) DataFooter *datafooter;
+
+//  时间点
+@property (nonatomic, assign) NSTimeInterval startConnectInterval;
+
+@property (nonatomic, assign) NSTimeInterval didConnectDuration;
+
+@property (nonatomic, assign) NSTimeInterval startScanInterval;
+
+@property (nonatomic, assign) NSTimeInterval didScanDuration;
 
 @end
 
@@ -56,6 +71,8 @@ static NSString *const cellid = @"cellid";
 
 - (void)setupSubviews{
     [self.navigationController.view addSubview:self.scanButton];
+    [self.navigationController.view addSubview:self.cutButton];
+    [self.navigationController.view addSubview:self.datafooter];
     self.centralManager = [[CBCentralManager alloc] initWithDelegate:self queue:dispatch_get_main_queue()];
     [self.centralManager scanForPeripheralsWithServices:nil options:@{CBCentralManagerRestoredStateScanOptionsKey:@(YES)}];
     self.command = 1001;
@@ -78,7 +95,6 @@ static NSString *const cellid = @"cellid";
         [_centralManager connectPeripheral:peripheral options:nil];
 //        NSLog(@"\ncentral : %@ \nperipheral : %@ \nadvertisement : %@",central, peripheral, advertisementData);
     }
-    
 }
 
 //  链接成功
@@ -86,6 +102,9 @@ static NSString *const cellid = @"cellid";
     NSLog(@">>>设备连接成功name:\n%@",peripheral.name);
     peripheral.delegate = self;
     [peripheral discoverServices:nil];
+    if (peripheral == _tagPeripheral) {
+        [MBProgressHUD bnt_showMessage:@"设备已连接"];
+    }
 }
 //  链接失败
 -(void)centralManager:(CBCentralManager *)central didFailToConnectPeripheral:(CBPeripheral *)peripheral error:(NSError *)error
@@ -96,7 +115,9 @@ static NSString *const cellid = @"cellid";
 - (void)centralManager:(CBCentralManager *)central didDisconnectPeripheral:(CBPeripheral *)peripheral error:(NSError *)error
 {
     NSLog(@">>>外设连接断开连接 %@: %@\n", [peripheral name], [error localizedDescription]);
-    
+    if (peripheral == _tagPeripheral) {
+        [MBProgressHUD bnt_showMessage:@"设备已断开"];
+    }
 }
 
 //  discovery service
@@ -123,11 +144,8 @@ static NSString *const cellid = @"cellid";
 //  discovery characteristics
 - (void)peripheral:(CBPeripheral *)peripheral didDiscoverCharacteristicsForService:(CBService *)service error:(NSError *)error{
     if (error) {
-        
-        
         NSLog(@"%@",[error localizedDescription]);
     }
-    
     
     NSInteger target = -1;
     if ([service.UUID.UUIDString isEqualToString:@"180A"]) {
@@ -144,17 +162,21 @@ static NSString *const cellid = @"cellid";
             [_centralManager cancelPeripheralConnection:peripheral];
         }
     }
-    
-    
+
     /*
      *    读取Characteristic
      */
-    /*
+/*
     for (CBCharacteristic *Characteristic in service.characteristics) {
         
 //        NSLog(@"\n*--* service:%@\n*--* characteristic:%@",service.UUID,Characteristic.UUID);
 //        if ([Characteristic..UUID.UUIDString isEqualToString:@"2A29"]) {//Manufacturer Name String
-        
+        [peripheral readValueForCharacteristic:Characteristic];
+        [peripheral setNotifyValue:YES forCharacteristic:Characteristic];
+        self.readCharacteristic = Characteristic;
+        self.tagPeripheral = peripheral;
+*/
+        /*
         if ([service.UUID.UUIDString isEqualToString:@"FFE0"]) {
 //            NSLog(@"\nSeverice = %@\nUUIDString = %@\nUUIDDescrption = %@", Characteristic.service.UUID.UUIDString, Characteristic.UUID.UUIDString,Characteristic.UUID.description);
             [peripheral readValueForCharacteristic:Characteristic];
@@ -168,10 +190,8 @@ static NSString *const cellid = @"cellid";
             [peripheral setNotifyValue:YES forCharacteristic:Characteristic];
             self.writeCharacteristic = Characteristic;
         }
-        
-        
     }
-    */
+         */
     
     
 //    if ([service.UUID.UUIDString isEqualToString:@"FFE0"]) {
@@ -213,6 +233,7 @@ static NSString *const cellid = @"cellid";
     if ([characteristic.UUID.UUIDString isEqualToString:@"2A29"]){
         if ([characteristicUTFString isEqualToString:@"SZ RF STAR CO.,LTD.\0"]) {
             if (_command == 1001) {
+                
                 [self reloadPeripheal:peripheral];
             }
             else if (_command == 1002){
@@ -224,7 +245,7 @@ static NSString *const cellid = @"cellid";
     }else if ([characteristic.UUID.UUIDString isEqualToString:@"FFE4"]){
         [self analyseIndicatorCharacteristicValue:characteristic];
     }
-    
+
 }
 
 //搜索到Characteristic的Descriptors
@@ -309,8 +330,10 @@ static NSString *const cellid = @"cellid";
         case CBManagerStateUnauthorized:
             break;
         case CBManagerStatePoweredOff:
+//            [self poweredOnalert];
             break;
         case CBManagerStatePoweredOn:
+            self.startScanInterval = [NSDate timenowInterval];
             [self.centralManager scanForPeripheralsWithServices:nil options:nil];
             break;
         default:
@@ -322,19 +345,25 @@ static NSString *const cellid = @"cellid";
 //  刷新设备
 - (void)scanAction:(UIButton *)button{
     _command = 1001;
+    
+    self.startScanInterval = [NSDate timenowInterval];
     [_centralManager scanForPeripheralsWithServices:nil options:@{CBCentralManagerRestoredStateScanOptionsKey:@(YES)}];
 }
 
 - (void)reloadPeripheal:(CBPeripheral *)peripheral{
     if (![self.targetPrpMArr containsObject:peripheral]) {
+        self.didScanDuration = [NSDate timefromInterval:self.startScanInterval];
         [self.targetPrpMArr addObject:peripheral];
-        [self.tableView reloadData];
         [_centralManager cancelPeripheralConnection:peripheral];
+        [self.tableView reloadData];
+        [self.datafooter interactScanDuration:self.didScanDuration peripheral:peripheral];
     }
 }
 
 //  接收数据
 - (void)readIndicatorCharacteristicValue:(CBPeripheral *)peripheral{
+    self.didScanDuration = [NSDate timefromInterval:self.startConnectInterval];
+    [self.datafooter interactConnectDuration:_didScanDuration peripheral:peripheral];
     self.tagPeripheral = peripheral;
     for (CBService *service in peripheral.services) {
         if ([service.UUID.UUIDString isEqualToString:@"FFE0"]) {
@@ -355,34 +384,64 @@ static NSString *const cellid = @"cellid";
     [analyse readValueAnalyse:characteristic.value];
 }
 
+//  断开连接
+- (void)disconnectPeripheral{
+    [_centralManager cancelPeripheralConnection:_tagPeripheral];
+}
+
+- (void)poweredOnalert{
+    UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"蓝牙未打开" message:@"请到“设置”-“蓝牙”打开蓝牙" preferredStyle:UIAlertControllerStyleAlert];
+    UIAlertAction *action1 = [UIAlertAction actionWithTitle:@"知道了"
+                              style:UIAlertActionStyleCancel handler:^(UIAlertAction * _Nonnull action) {
+                                  
+                              }];
+    /*
+    UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"蓝牙未打开" message:@"请打开蓝牙" preferredStyle:UIAlertControllerStyleAlert];
+    UIAlertAction *action1 = [UIAlertAction actionWithTitle:@"设置蓝牙"style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action)
+                              {
+                                  
+                                          NSURL *url = [NSURL URLWithString:UIApplicationOpenSettingsURLString];
+                                          if ([[UIApplication sharedApplication] canOpenURL:url]) {
+                                              [[UIApplication sharedApplication] openURL:url options:nil completionHandler:^(BOOL success) {
+                                                  
+                                              }];
+                                          }
+                              }];
+    */
+    [alert addAction:action1];
+    [self presentViewController:alert animated:YES completion:^{
+    }];
+}
+
 #pragma mark - CharacteristicData Analyse Delegete
 
 - (void)dataAnalyseSuccessWithData:(id)dataModel{
     DetectionIndexModel *model = (DetectionIndexModel *)dataModel;
-    [self.tagPeripheral setNotifyValue:NO forCharacteristic:self.readCharacteristic];
+//    [self.tagPeripheral setNotifyValue:NO forCharacteristic:self.readCharacteristic];
 //    [self.tagPeripheral writeValue:[CharacteristicResponse historyDataResponse] forCharacteristic:self.writeCharacteristic type:CBCharacteristicWriteWithResponse];
     NSLog(@"%@",model);
-    NSString *project;
-    switch (model.project) {
-        case 2:
-            project = @"血糖";
-            break;
-        case 3:
-            project = @"血尿酸";
-            break;
-        case 4:
-            project = @"胆固醇";
-            break;
-            
-        default:
-            break;
-    }
-   [MBProgressHUD bnt_showMessage:[NSString stringWithFormat:@"检测项：%@\n检测时间：%@\n检测结果：%@"
-                                   ,project,model.detectionDate,model.indicator]];
+//    NSString *project;
+//    switch (model.project) {
+//        case 2:
+//            project = @"血糖";
+//            break;
+//        case 3:
+//            project = @"血尿酸";
+//            break;
+//        case 4:
+//            project = @"胆固醇";
+//            break;
+//            
+//        default:
+//            break;
+//    }
+//   [MBProgressHUD bnt_showMessage:[NSString stringWithFormat:@"检测项：%@\n检测时间：%@\n检测结果：%@"
+//                                   ,project,model.detectionDate,model.indicator]];
+    [self.datafooter interactData:model];
 }
 
 - (void)dataAnalyseFailure{
-    NSLog(@"123");
+    NSLog(@"非标数据");
 }
 
 #pragma mark - Table view data source
@@ -407,6 +466,7 @@ static NSString *const cellid = @"cellid";
 }
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath{
+
     CBPeripheral *peripheral = self.targetPrpMArr[indexPath.row];
     for (CBPeripheral *prp in self.targetPrpMArr) {
         if (![prp isEqual:peripheral]) {
@@ -415,7 +475,10 @@ static NSString *const cellid = @"cellid";
     }
     [_centralManager stopScan];
     _command = 1002;
+    self.startConnectInterval = [NSDate timenowInterval];
+//    CBPeripheral *peripheral = self.peripheralMArr[indexPath.row];
     [_centralManager connectPeripheral:peripheral options:nil];
+    self.tagPeripheral = peripheral;
 }
 
 - (NSMutableArray *)peripheralMArr{
@@ -439,15 +502,36 @@ static NSString *const cellid = @"cellid";
     return _scanPrpMArr;
 }
 
+
+
 - (UIButton *)scanButton{
     if (_scanButton == nil) {
         _scanButton = [UIButton buttonWithType:UIButtonTypeCustom];
-        _scanButton.backgroundColor = [UIColor lightGrayColor];
+        _scanButton.backgroundColor = [UIColor grayColor];
         [_scanButton setTitle:@"扫描设备" forState:UIControlStateNormal];
-        _scanButton.frame = CGRectMake(0, SCREEN_HEIGHT - 44, SCREEN_WIDTH, 44);
+        _scanButton.frame = CGRectMake(0, SCREEN_HEIGHT - 44, SCREEN_WIDTH / 2, 44);
         [_scanButton addTarget:self action:@selector(scanAction:) forControlEvents:UIControlEventTouchUpInside];
     }
     return _scanButton;
+}
+
+- (UIButton *)cutButton{
+    if (_cutButton == nil) {
+        _cutButton = [UIButton buttonWithType:UIButtonTypeCustom];
+        _cutButton.frame = CGRectMake(SCREEN_WIDTH / 2, SCREEN_HEIGHT - 44, SCREEN_WIDTH / 2, 44);
+        [_cutButton addTarget:self action:@selector(disconnectPeripheral) forControlEvents:UIControlEventTouchUpInside];
+        _cutButton.backgroundColor = [UIColor lightGrayColor];
+        [_cutButton setTitle:@"断开连接" forState:UIControlStateNormal];
+    }
+    return _cutButton;
+}
+
+- (DataFooter *)datafooter{
+    if (_datafooter == nil) {
+        _datafooter = [[DataFooter alloc] initWithFrame:CGRectMake(0, SCREEN_HEIGHT - 274, SCREEN_WIDTH, 230)];
+        
+    }
+    return _datafooter;
 }
 
 @end
