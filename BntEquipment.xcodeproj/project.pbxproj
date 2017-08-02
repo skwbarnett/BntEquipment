@@ -25,6 +25,8 @@
 		8019873F1DF1759E005EBB07 /* NSString+Bnt.m in Sources */ = {isa = PBXBuildFile; fileRef = 8019873B1DF1759E005EBB07 /* NSString+Bnt.m */; };
 		801987421DF5743F005EBB07 /* NSDate+Bnt.m in Sources */ = {isa = PBXBuildFile; fileRef = 801987411DF5743F005EBB07 /* NSDate+Bnt.m */; };
 		801987451DF57779005EBB07 /* DataFooter.m in Sources */ = {isa = PBXBuildFile; fileRef = 801987441DF57779005EBB07 /* DataFooter.m */; };
+		804B71211E0A794700F3BBD4 /* EquipmentOperation.m in Sources */ = {isa = PBXBuildFile; fileRef = 804B71201E0A794700F3BBD4 /* EquipmentOperation.m */; };
+		804B71241E0A7B1400F3BBD4 /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 804B71231E0A7B1400F3BBD4 /* ViewController.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -81,6 +83,10 @@
 		801987411DF5743F005EBB07 /* NSDate+Bnt.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = "NSDate+Bnt.m"; path = "../NSDate+Bnt.m"; sourceTree = "<group>"; };
 		801987431DF57779005EBB07 /* DataFooter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DataFooter.h; sourceTree = "<group>"; };
 		801987441DF57779005EBB07 /* DataFooter.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DataFooter.m; sourceTree = "<group>"; };
+		804B711F1E0A794700F3BBD4 /* EquipmentOperation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EquipmentOperation.h; sourceTree = "<group>"; };
+		804B71201E0A794700F3BBD4 /* EquipmentOperation.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = EquipmentOperation.m; sourceTree = "<group>"; };
+		804B71221E0A7B1400F3BBD4 /* ViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ViewController.h; sourceTree = "<group>"; };
+		804B71231E0A7B1400F3BBD4 /* ViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ViewController.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -134,8 +140,12 @@
 				801987321DF1759E005EBB07 /* Help */,
 				801986EC1DF17486005EBB07 /* AppDelegate.h */,
 				801986ED1DF17486005EBB07 /* AppDelegate.m */,
+				804B71221E0A7B1400F3BBD4 /* ViewController.h */,
+				804B71231E0A7B1400F3BBD4 /* ViewController.m */,
 				801987221DF17545005EBB07 /* EquipSearchController.h */,
 				801987231DF17545005EBB07 /* EquipSearchController.m */,
+				804B711F1E0A794700F3BBD4 /* EquipmentOperation.h */,
+				804B71201E0A794700F3BBD4 /* EquipmentOperation.m */,
 				801987431DF57779005EBB07 /* DataFooter.h */,
 				801987441DF57779005EBB07 /* DataFooter.m */,
 				8019871C1DF17545005EBB07 /* CharacteristicDataAnalyse.h */,
@@ -348,8 +358,10 @@
 				8019873C1DF1759E005EBB07 /* MBProgressHUD+Bnt.m in Sources */,
 				8019872E1DF17545005EBB07 /* EquipSearchController.m in Sources */,
 				801987451DF57779005EBB07 /* DataFooter.m in Sources */,
+				804B71211E0A794700F3BBD4 /* EquipmentOperation.m in Sources */,
 				8019873F1DF1759E005EBB07 /* NSString+Bnt.m in Sources */,
 				8019873D1DF1759E005EBB07 /* MBProgressHUD.m in Sources */,
+				804B71241E0A7B1400F3BBD4 /* ViewController.m in Sources */,
 				8019873E1DF1759E005EBB07 /* NSData+Bnt.m in Sources */,
 				801986EB1DF17486005EBB07 /* main.m in Sources */,
 				801987311DF17545005EBB07 /* SearchTableViewCell.m in Sources */,

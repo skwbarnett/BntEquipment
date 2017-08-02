@@ -1,13 +1,12 @@
 //
-//  EquipSearchController.m
-//  EquipmentSDK
+//  EquipmentOperation.m
+//  BntEquipment
 //
-//  Created by Barnett Wu on 2016/11/22.
+//  Created by 吴克赛 on 2016/12/21.
 //  Copyright © 2016年 Barnett Wu. All rights reserved.
 //
 
-#import "EquipSearchController.h"
-#import "SearchTableViewCell.h"
+#import "EquipmentOperation.h"
 #import "CharacteristicDataAnalyse.h"
 #import "CharacteristicResponse.h"
 #import <CoreBluetooth/CoreBluetooth.h>
@@ -15,14 +14,13 @@
 #import "DetectionIndexModel.h"
 #import "MBProgressHUD+Bnt.h"
 #import "NSDate+Bnt.h"
-#import "DataFooter.h"
 
 #define NSLog(FORMAT, ...) fprintf(stderr,"\nfunction:%s line:%d content:\n%s\n", __FUNCTION__, __LINE__, [[NSString stringWithFormat:FORMAT, ##__VA_ARGS__] UTF8String]);
 #define SCREEN_WIDTH  [UIScreen mainScreen].bounds.size.width
 #define SCREEN_HEIGHT     [UIScreen mainScreen].bounds.size.height
 
 
-@interface EquipSearchController ()<CBCentralManagerDelegate, CBPeripheralDelegate, CharacteristicDataAnalyseDelegete>
+@interface EquipmentOperation ()<CBCentralManagerDelegate, CBPeripheralDelegate, CharacteristicDataAnalyseDelegete>
 
 @property (nonatomic, strong) CBCentralManager *centralManager;
 
@@ -46,8 +44,6 @@
 
 @property (nonatomic, assign) NSInteger command;//  1001 scan 1002 analyse
 
-@property (nonatomic, strong) DataFooter *datafooter;
-
 //  时间点
 @property (nonatomic, assign) NSTimeInterval startConnectInterval;
 
@@ -59,41 +55,37 @@
 
 @end
 
-@implementation EquipSearchController
+@implementation EquipmentOperation
 
-static NSString *const cellid = @"cellid";
-
-- (void)viewDidLoad {
-    [super viewDidLoad];
-    [self.tableView registerClass:[SearchTableViewCell class] forCellReuseIdentifier:cellid];
-    [self setupSubviews];
+- (instancetype)init{
+    if (self = [super init]) {
+        [self configureEquipment];
+    }
+    return self;
 }
 
-- (void)setupSubviews{
-    [self.navigationController.view addSubview:self.scanButton];
-    [self.navigationController.view addSubview:self.cutButton];
-    [self.navigationController.view addSubview:self.datafooter];
+- (void)configureEquipment{
     self.centralManager = [[CBCentralManager alloc] initWithDelegate:self queue:dispatch_get_main_queue()];
     [self.centralManager scanForPeripheralsWithServices:nil options:@{CBCentralManagerRestoredStateScanOptionsKey:@(YES)}];
     self.command = 1001;
 }
 
 - (void)centralManager:(CBCentralManager *)central didDiscoverPeripheral:(CBPeripheral *)peripheral advertisementData:(NSDictionary<NSString *,id> *)advertisementData RSSI:(NSNumber *)RSSI{
-//    int j = -1;
-//    for (int i = 0 ; i < self.peripheralMArr.count; i ++) {
-//        CBPeripheral *per = self.peripheralMArr[i];
-//        if ([per.identifier isEqual:peripheral.identifier]) {
-//            j = i;
-//            break;
-//        }
-//    }
+    //    int j = -1;
+    //    for (int i = 0 ; i < self.peripheralMArr.count; i ++) {
+    //        CBPeripheral *per = self.peripheralMArr[i];
+    //        if ([per.identifier isEqual:peripheral.identifier]) {
+    //            j = i;
+    //            break;
+    //        }
+    //    }
     //    if (j == -1) {
     //    }
     if (![self.peripheralMArr containsObject:peripheral]) {
         [self.peripheralMArr addObject:peripheral];
-//        [self.tableView reloadData]; 
+        //        [self.tableView reloadData];
         [_centralManager connectPeripheral:peripheral options:nil];
-//        NSLog(@"\ncentral : %@ \nperipheral : %@ \nadvertisement : %@",central, peripheral, advertisementData);
+        //        NSLog(@"\ncentral : %@ \nperipheral : %@ \nadvertisement : %@",central, peripheral, advertisementData);
     }
 }
 
@@ -162,56 +154,56 @@ static NSString *const cellid = @"cellid";
             [_centralManager cancelPeripheralConnection:peripheral];
         }
     }
-
+    
     /*
      *    读取Characteristic
      */
-/*
-    for (CBCharacteristic *Characteristic in service.characteristics) {
-        
-//        NSLog(@"\n*--* service:%@\n*--* characteristic:%@",service.UUID,Characteristic.UUID);
-//        if ([Characteristic..UUID.UUIDString isEqualToString:@"2A29"]) {//Manufacturer Name String
-        [peripheral readValueForCharacteristic:Characteristic];
-        [peripheral setNotifyValue:YES forCharacteristic:Characteristic];
-        self.readCharacteristic = Characteristic;
-        self.tagPeripheral = peripheral;
-*/
-        /*
-        if ([service.UUID.UUIDString isEqualToString:@"FFE0"]) {
-//            NSLog(@"\nSeverice = %@\nUUIDString = %@\nUUIDDescrption = %@", Characteristic.service.UUID.UUIDString, Characteristic.UUID.UUIDString,Characteristic.UUID.description);
-            [peripheral readValueForCharacteristic:Characteristic];
-            [peripheral discoverDescriptorsForCharacteristic:Characteristic];
-            [peripheral setNotifyValue:YES forCharacteristic:Characteristic];
-            self.readCharacteristic = Characteristic;
-            self.tagPeripheral = peripheral;
-        }
-        if ([service.UUID.UUIDString isEqualToString:@"FFE5"]) {
-            [peripheral readValueForCharacteristic:Characteristic];
-            [peripheral setNotifyValue:YES forCharacteristic:Characteristic];
-            self.writeCharacteristic = Characteristic;
-        }
-    }
-         */
+    /*
+     for (CBCharacteristic *Characteristic in service.characteristics) {
+     
+     //        NSLog(@"\n*--* service:%@\n*--* characteristic:%@",service.UUID,Characteristic.UUID);
+     //        if ([Characteristic..UUID.UUIDString isEqualToString:@"2A29"]) {//Manufacturer Name String
+     [peripheral readValueForCharacteristic:Characteristic];
+     [peripheral setNotifyValue:YES forCharacteristic:Characteristic];
+     self.readCharacteristic = Characteristic;
+     self.tagPeripheral = peripheral;
+     */
+    /*
+     if ([service.UUID.UUIDString isEqualToString:@"FFE0"]) {
+     //            NSLog(@"\nSeverice = %@\nUUIDString = %@\nUUIDDescrption = %@", Characteristic.service.UUID.UUIDString, Characteristic.UUID.UUIDString,Characteristic.UUID.description);
+     [peripheral readValueForCharacteristic:Characteristic];
+     [peripheral discoverDescriptorsForCharacteristic:Characteristic];
+     [peripheral setNotifyValue:YES forCharacteristic:Characteristic];
+     self.readCharacteristic = Characteristic;
+     self.tagPeripheral = peripheral;
+     }
+     if ([service.UUID.UUIDString isEqualToString:@"FFE5"]) {
+     [peripheral readValueForCharacteristic:Characteristic];
+     [peripheral setNotifyValue:YES forCharacteristic:Characteristic];
+     self.writeCharacteristic = Characteristic;
+     }
+     }
+     */
     
     
-//    if ([service.UUID.UUIDString isEqualToString:@"FFE0"]) {
-//        for (CBCharacteristic *characteristic in service.characteristics){
-//            [peripheral readValueForCharacteristic:characteristic];
-//            [peripheral setNotifyValue:YES forCharacteristic:characteristic];
-//        }
-//    }
+    //    if ([service.UUID.UUIDString isEqualToString:@"FFE0"]) {
+    //        for (CBCharacteristic *characteristic in service.characteristics){
+    //            [peripheral readValueForCharacteristic:characteristic];
+    //            [peripheral setNotifyValue:YES forCharacteristic:characteristic];
+    //        }
+    //    }
     
     /*
      *  读取 Characteristic 的 Descriptors
      *
      */
     
-//    for (CBCharacteristic *Characteristic in service.characteristics) {
-////        Characteristic.service.characteristics
-////        if ([Characteristic.UUID.description isEqualToString:@"System ID"]) {
-//            [peripheral discoverDescriptorsForCharacteristic:Characteristic];
-////        }
-//    }
+    //    for (CBCharacteristic *Characteristic in service.characteristics) {
+    ////        Characteristic.service.characteristics
+    ////        if ([Characteristic.UUID.description isEqualToString:@"System ID"]) {
+    //            [peripheral discoverDescriptorsForCharacteristic:Characteristic];
+    ////        }
+    //    }
 }
 
 //获取charateristic的value
@@ -223,12 +215,12 @@ static NSString *const cellid = @"cellid";
     
     NSLog(@"\n>>>characteristic : %@\n>>>characteristic-UTF8 : %@\n>>>characteristic-value : %@\n>>>characValueHex : %@\n>>>propertise: %lu",characteristic.UUID.UUIDString,characteristicUTFString,characteristic.value,characValueHex,(unsigned long)characteristic.properties);
     
-//    if ([characteristic.UUID.UUIDString isEqualToString:@"FFE4"]&&
-//        [characteristicUTFString isEqualToString:@""]) {
-//        if (characteristic) {
-//
-//        }
-//    }
+    //    if ([characteristic.UUID.UUIDString isEqualToString:@"FFE4"]&&
+    //        [characteristicUTFString isEqualToString:@""]) {
+    //        if (characteristic) {
+    //
+    //        }
+    //    }
     
     if ([characteristic.UUID.UUIDString isEqualToString:@"2A29"]){
         if ([characteristicUTFString isEqualToString:@"SZ RF STAR CO.,LTD.\0"]) {
@@ -245,7 +237,7 @@ static NSString *const cellid = @"cellid";
     }else if ([characteristic.UUID.UUIDString isEqualToString:@"FFE4"]){
         [self analyseIndicatorCharacteristicValue:characteristic];
     }
-
+    
 }
 
 //搜索到Characteristic的Descriptors
@@ -253,7 +245,7 @@ static NSString *const cellid = @"cellid";
 {
     for (CBDescriptor *des in characteristic.descriptors) {
         
-//        NSLog(@"\n>>>descriptor:%@\n>>>characteristic:%@",des.UUID,characteristic.UUID);
+        //        NSLog(@"\n>>>descriptor:%@\n>>>characteristic:%@",des.UUID,characteristic.UUID);
         [peripheral readValueForDescriptor:des];
     }
 }
@@ -263,7 +255,7 @@ static NSString *const cellid = @"cellid";
 {
     
     //这个descriptor都是对于characteristic的描述，一般都是字符串，所以这里我们转换成字符串去解析
-//    NSLog(@"\n<<<characteristic uuid:%@ \n<<<value:%@",[NSString stringWithFormat:@"%@",descriptor.UUID],descriptor.value);
+    //    NSLog(@"\n<<<characteristic uuid:%@ \n<<<value:%@",[NSString stringWithFormat:@"%@",descriptor.UUID],descriptor.value);
     
 }
 
@@ -320,7 +312,7 @@ static NSString *const cellid = @"cellid";
 - (void)centralManagerDidUpdateState:(CBCentralManager *)central{
     NSLog(@"%@",central);
     switch (central.state) {
-        
+            
         case CBManagerStateUnknown:
             break;
         case CBManagerStateResetting:
@@ -330,7 +322,7 @@ static NSString *const cellid = @"cellid";
         case CBManagerStateUnauthorized:
             break;
         case CBManagerStatePoweredOff:
-//            [self poweredOnalert];
+            //            [self poweredOnalert];
             break;
         case CBManagerStatePoweredOn:
             self.startScanInterval = [NSDate timenowInterval];
@@ -354,17 +346,19 @@ static NSString *const cellid = @"cellid";
     if (![self.targetPrpMArr containsObject:peripheral]) {
         self.didScanDuration = [NSDate timefromInterval:self.startScanInterval];
         [self.targetPrpMArr addObject:peripheral];
-        [_centralManager cancelPeripheralConnection:peripheral];
-        
-        [self.tableView reloadData];
-        [self.datafooter interactScanDuration:self.didScanDuration peripheral:peripheral];
+//        [_centralManager cancelPeripheralConnection:peripheral];
     }
+    
+    _command = 1002;
+    [_centralManager stopScan];
+    self.tagPeripheral = peripheral;
+    [_centralManager connectPeripheral:peripheral options:nil];
+    
 }
 
 //  接收数据
 - (void)readIndicatorCharacteristicValue:(CBPeripheral *)peripheral{
     self.didScanDuration = [NSDate timefromInterval:self.startConnectInterval];
-    [self.datafooter interactConnectDuration:_didScanDuration peripheral:peripheral];
     self.tagPeripheral = peripheral;
     for (CBService *service in peripheral.services) {
         if ([service.UUID.UUIDString isEqualToString:@"FFE0"]) {
@@ -393,93 +387,57 @@ static NSString *const cellid = @"cellid";
 - (void)poweredOnalert{
     UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"蓝牙未打开" message:@"请到“设置”-“蓝牙”打开蓝牙" preferredStyle:UIAlertControllerStyleAlert];
     UIAlertAction *action1 = [UIAlertAction actionWithTitle:@"知道了"
-                              style:UIAlertActionStyleCancel handler:^(UIAlertAction * _Nonnull action) {
-                                  
-                              }];
+                                                      style:UIAlertActionStyleCancel handler:^(UIAlertAction * _Nonnull action) {
+                                                          
+                                                      }];
     /*
-    UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"蓝牙未打开" message:@"请打开蓝牙" preferredStyle:UIAlertControllerStyleAlert];
-    UIAlertAction *action1 = [UIAlertAction actionWithTitle:@"设置蓝牙"style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action)
-                              {
-                                  
-                                          NSURL *url = [NSURL URLWithString:UIApplicationOpenSettingsURLString];
-                                          if ([[UIApplication sharedApplication] canOpenURL:url]) {
-                                              [[UIApplication sharedApplication] openURL:url options:nil completionHandler:^(BOOL success) {
-                                                  
-                                              }];
-                                          }
-                              }];
-    */
+     UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"蓝牙未打开" message:@"请打开蓝牙" preferredStyle:UIAlertControllerStyleAlert];
+     UIAlertAction *action1 = [UIAlertAction actionWithTitle:@"设置蓝牙"style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action)
+     {
+     
+     NSURL *url = [NSURL URLWithString:UIApplicationOpenSettingsURLString];
+     if ([[UIApplication sharedApplication] canOpenURL:url]) {
+     [[UIApplication sharedApplication] openURL:url options:nil completionHandler:^(BOOL success) {
+     
+     }];
+     }
+     }];
+     */
     [alert addAction:action1];
-    [self presentViewController:alert animated:YES completion:^{
-    }];
 }
 
 #pragma mark - CharacteristicData Analyse Delegete
 
 - (void)dataAnalyseSuccessWithData:(id)dataModel{
     DetectionIndexModel *model = (DetectionIndexModel *)dataModel;
-//    [self.tagPeripheral setNotifyValue:NO forCharacteristic:self.readCharacteristic];
-//    [self.tagPeripheral writeValue:[CharacteristicResponse historyDataResponse] forCharacteristic:self.writeCharacteristic type:CBCharacteristicWriteWithResponse];
+    //    [self.tagPeripheral setNotifyValue:NO forCharacteristic:self.readCharacteristic];
+    //    [self.tagPeripheral writeValue:[CharacteristicResponse historyDataResponse] forCharacteristic:self.writeCharacteristic type:CBCharacteristicWriteWithResponse];
     NSLog(@"%@",model);
-//    NSString *project;
-//    switch (model.project) {
-//        case 2:
-//            project = @"血糖";
-//            break;
-//        case 3:
-//            project = @"血尿酸";
-//            break;
-//        case 4:
-//            project = @"胆固醇";
-//            break;
-//            
-//        default:
-//            break;
-//    }
-//   [MBProgressHUD bnt_showMessage:[NSString stringWithFormat:@"检测项：%@\n检测时间：%@\n检测结果：%@"
-//                                   ,project,model.detectionDate,model.indicator]];
-    [self.datafooter interactData:model];
+    if ([self.delegate respondsToSelector:@selector(equipmentGetDataSuccess:)]) {
+        [self.delegate equipmentGetDataSuccess:dataModel];
+    }
+    //    NSString *project;
+    //    switch (model.project) {
+    //        case 2:
+    //            project = @"血糖";
+    //            break;
+    //        case 3:
+    //            project = @"血尿酸";
+    //            break;
+    //        case 4:
+    //            project = @"胆固醇";
+    //            break;
+    //
+    //        default:
+    //            break;
+    //    }
+    //   [MBProgressHUD bnt_showMessage:[NSString stringWithFormat:@"检测项：%@\n检测时间：%@\n检测结果：%@"
+    //                                   ,project,model.detectionDate,model.indicator]];
+    
 }
 
 - (void)dataAnalyseFailure{
     NSLog(@"非标数据");
-}
-
-#pragma mark - Table view data source
-
-- (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
-    return 1;
-}
-
-- (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
-//    return self.peripheralMArr.count;
-    return self.targetPrpMArr.count;
-}
-
-- (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
-    SearchTableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:cellid forIndexPath:indexPath];
-    [cell interactData:self.targetPrpMArr index:indexPath.row];
-    return cell;
-}
-
-- (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath{
-    return 100;
-}
-
-- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath{
-
-    CBPeripheral *peripheral = self.targetPrpMArr[indexPath.row];
-    for (CBPeripheral *prp in self.targetPrpMArr) {
-        if (![prp isEqual:peripheral]) {
-            [_centralManager cancelPeripheralConnection:prp];
-        }
-    }
-    [_centralManager stopScan];
-    _command = 1002;
-    self.startConnectInterval = [NSDate timenowInterval];
-//    CBPeripheral *peripheral = self.peripheralMArr[indexPath.row];
-    [_centralManager connectPeripheral:peripheral options:nil];
-    self.tagPeripheral = peripheral;
 }
 
 - (NSMutableArray *)peripheralMArr{
@@ -501,38 +459,6 @@ static NSString *const cellid = @"cellid";
         _scanPrpMArr = [NSMutableArray array];
     }
     return _scanPrpMArr;
-}
-
-
-
-- (UIButton *)scanButton{
-    if (_scanButton == nil) {
-        _scanButton = [UIButton buttonWithType:UIButtonTypeCustom];
-        _scanButton.backgroundColor = [UIColor grayColor];
-        [_scanButton setTitle:@"扫描设备" forState:UIControlStateNormal];
-        _scanButton.frame = CGRectMake(0, SCREEN_HEIGHT - 44, SCREEN_WIDTH / 2, 44);
-        [_scanButton addTarget:self action:@selector(scanAction:) forControlEvents:UIControlEventTouchUpInside];
-    }
-    return _scanButton;
-}
-
-- (UIButton *)cutButton{
-    if (_cutButton == nil) {
-        _cutButton = [UIButton buttonWithType:UIButtonTypeCustom];
-        _cutButton.frame = CGRectMake(SCREEN_WIDTH / 2, SCREEN_HEIGHT - 44, SCREEN_WIDTH / 2, 44);
-        [_cutButton addTarget:self action:@selector(disconnectPeripheral) forControlEvents:UIControlEventTouchUpInside];
-        _cutButton.backgroundColor = [UIColor lightGrayColor];
-        [_cutButton setTitle:@"断开连接" forState:UIControlStateNormal];
-    }
-    return _cutButton;
-}
-
-- (DataFooter *)datafooter{
-    if (_datafooter == nil) {
-        _datafooter = [[DataFooter alloc] initWithFrame:CGRectMake(0, SCREEN_HEIGHT - 274, SCREEN_WIDTH, 230)];
-        
-    }
-    return _datafooter;
 }
 
 @end

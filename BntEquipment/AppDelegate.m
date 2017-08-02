@@ -8,6 +8,7 @@
 
 #import "AppDelegate.h"
 #import "EquipSearchController.h"
+#import "ViewController.h"
 
 @interface AppDelegate ()
 
@@ -17,7 +18,7 @@
 
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
-    UINavigationController *nvc = [[UINavigationController alloc] initWithRootViewController:[[EquipSearchController alloc]init]];
+    UINavigationController *nvc = [[UINavigationController alloc] initWithRootViewController:[[ViewController alloc] init]];
     self.window.rootViewController = nvc;
     return YES;
 }
